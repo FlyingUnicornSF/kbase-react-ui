@@ -82,7 +82,11 @@ export class NarrativeList extends Component<Props, State> {
       return;
     }
   }
-  // Handle an onSetSearch callback from Filters
+
+  /**
+   * Handle an onSetSearch callback from Filters
+   * @param searchP
+   */
   handleSearch(searchP: { term: string; sort: string }): void {
     const searchParams = this.state.searchParams;
     searchParams.term = searchP.term;
@@ -91,14 +95,15 @@ export class NarrativeList extends Component<Props, State> {
     this.setState({ searchParams });
     this.performSearch();
   }
-  // TODO: New function replace this
-  // user enums instead of const categoryMap
 
-  // Handle an onSelectTab callback from TabHeader
+  /**
+   * Handle an onSelectTab callback from TabHeader
+   * @param name
+   */
   handleTabChange(name: string): void {
     // Reset the search state and results
+    // except search term
     const searchParams = this.state.searchParams;
-    searchParams.term = '';
     searchParams.skip = 0;
     const categoryMap: { [key: string]: string } = {
       'my narratives': 'own',
@@ -119,7 +124,9 @@ export class NarrativeList extends Component<Props, State> {
     this.performSearch();
   }
 
-  // Handle the onLoadMore callback from ItemList
+  /**
+   * Handle the onLoadMore callback from ItemList
+   */
   handleLoadMore() {
     const searchParams = this.state.searchParams;
     // Increment the skip size to be a multiple of the page size.
@@ -128,13 +135,18 @@ export class NarrativeList extends Component<Props, State> {
     this.performSearch();
   }
 
-  // Handle an onSelectItem callback from ItemList
-  // Receives the index of the selected item
+  /**
+   * Handle an onSelectItem callback from ItemList
+   * Receives the index of the selected item
+   * @param idx
+   */
   handleSelectItem(idx: number) {
     this.setState({ activeIdx: idx });
   }
 
-  // Perform a search and return the Promise for the fetch
+  /**
+   *  Perform a search and return the Promise for the fetch
+   */
   performSearch() {
     this.setState({ loading: true });
     const searchParams = this.state.searchParams;
@@ -165,6 +177,21 @@ export class NarrativeList extends Component<Props, State> {
     // TODO handle error from server
   }
 
+  /**
+   * handles narrative search input on change
+   * @param e
+   */
+  searchNarrativeOnChange(e: any) {
+    if (e?.currentTarget?.value === '') {
+      let searchParams = this.state.searchParams;
+      searchParams.term = '';
+      this.setState({ searchParams });
+      this.performSearch();
+    }
+  }
+  /**
+   * bootstrap Tabs
+   */
   bootstrapTabContainer() {
     return (
       <div className="boostrap-tab-container">
@@ -172,6 +199,9 @@ export class NarrativeList extends Component<Props, State> {
           <Nav>
             <Form inline onSubmit={(e: any) => this.bootstrapSubmit(e)}>
               <FormControl
+                onChange={(e: React.FormEvent) =>
+                  this.searchNarrativeOnChange(e)
+                }
                 className="narrative-search-input"
                 type="text"
                 id="narrative-search"
@@ -212,6 +242,11 @@ export class NarrativeList extends Component<Props, State> {
       </div>
     );
   }
+
+  /**
+   * handle search wrapper for bootstrap
+   * @param e
+   */
   bootstrapSubmit(e: any) {
     e.preventDefault();
     e.stopPropagation();
@@ -224,8 +259,15 @@ export class NarrativeList extends Component<Props, State> {
     });
   }
 
+  /**
+   * drop down sort wrapper for bootstrap
+   * @param eventKey
+   */
   bootstrapDropDownChange(eventKey: string) {
-    this.handleSearch({ term: this.state.searchParams.term, sort: eventKey });
+    this.handleSearch({
+      term: this.state.searchParams.term,
+      sort: eventKey,
+    });
   }
 
   render() {
@@ -270,18 +312,6 @@ export class NarrativeList extends Component<Props, State> {
               {this.bootstrapTabContainer()}
             </Tab.Pane>
           </Tab.Content>
-          {/* <Tab.Content>
-            <Tab.Pane eventKey="My narratives">{this.bootstrapTabContainer()}</Tab.Pane>
-          </Tab.Content> */}
-          {/* <Tab.Content>
-            <Tab.Pane eventKey="Shared with me">{this.bootstrapTabContainer()}</Tab.Pane>
-          </Tab.Content>
-          <Tab.Content>
-            <Tab.Pane eventKey="Tutorials">{this.bootstrapTabContainer()}</Tab.Pane>
-          </Tab.Content>
-          <Tab.Content>
-            <Tab.Pane eventKey="Public">{this.bootstrapTabContainer()}</Tab.Pane>
-          </Tab.Content> */}
         </Tab.Container>
       </>
     );
